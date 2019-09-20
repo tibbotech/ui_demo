@@ -1,6 +1,6 @@
 [project]
 version=1
-platform=TPP2W(G2)
+platform=TPP3W(G2)
 src_lib_ver=2_01_03
 name=ui_demo
 output=ui_demo.tpc
@@ -9,6 +9,10 @@ defines=
 transport=udp_broadcast
 [address1]
 platform=TPP2W(G2)
+transport=udp_broadcast
+address=0.36.119.82.177.95
+[address2]
+platform=TPP3W(G2)
 transport=udp_broadcast
 address=0.36.119.82.177.95
 [file1]

@@ -12,7 +12,7 @@ opened=yes
 breakpoints=
 [file3]
 line=6
-cursor=409
+cursor=359
 opened=active
 breakpoints=41,117
 [file4]
