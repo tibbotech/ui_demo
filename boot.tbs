@@ -1,0 +1,84 @@
+include "global.tbh"
+
+
+
+sub boot()
+    
+    'Setting Library Initialization
+    '================================================================
+    dim stg_init_code as en_stg_status_codes
+    dim stg_name as string(STG_MAX_SETTING_NAME_LEN)
+    if stg_start()<>EN_STG_STATUS_OK then sys.halt
+    stg_init_code=stg_check_all(stg_name)
+    select case stg_init_code
+    case EN_STG_STATUS_OK:
+    '--- all good ---
+    case EN_STG_STATUS_INVALID, EN_STG_STATUS_FAILURE:
+        if stg_restore_multiple(EN_STG_INIT_MODE_NORMAL)<>EN_STG_STATUS_OK then 
+            sys.halt
+        end if
+    case else:
+        'some other trouble
+        sys.halt
+    end select
+    '-----------------------------------------------------------------
+
+    'Wifi setup
+    '================================================================
+	if stg_get("WE",0)="1" then
+		wln.ip=stg_get("WI",0)
+		wln.netmask=stg_get("WN",0)
+		wln.gatewayip=stg_get("WG",0)
+		dim security_mode as pl_wln_security_modes
+
+		select case stg_get("SEC",0)
+		case "0": security_mode=WLN_SECURITY_MODE_DISABLED
+		case "1": security_mode=WLN_SECURITY_MODE_WEP64
+		case "2": security_mode=WLN_SECURITY_MODE_WEP128
+		case "3": security_mode=WLN_SECURITY_MODE_WPA1
+		case "4": security_mode=WLN_SECURITY_MODE_WPA2
+		case else:	
+		end select
+		if wln_start(stg_get("APN",0),WLN_SECURITY_MODE_WPA2,stg_get("PWD",0),PL_WLN_DOMAIN_FCC,NO,PL_WLN_ASCAN_INFRASTRUCTURE)<>WLN_STATUS_OK then
+			sys.debugprint("wifi did not start successfully\r\n")
+		end if
+	end if
+    'wifi dhcp
+	if stg_get("WD",0)="1" then 
+		dhcp_start(PL_SOCK_INTERFACE_WLN,"","") 
+	end if	
+    '-----------------------------------------------------------------
+
+    'Ethernet setup
+    '================================================================
+    net.ip=stg_get("IP",0)
+    net.netmask=stg_get("NM",0)
+    net.gatewayip=stg_get("GI",0)
+	
+    '-----------------------------------------------------------------
+
+    luis_start(LUIS_BT_DEVICE_NAME)
+
+    'LUIS Web setup
+    '================================================================
+    sock.num=sock_get("LUIS_WEB")
+    sock.allowedinterfaces = "WLN,NET"
+    sock.txbuffrq(16)
+    sock.varbuffrq(16)
+    sock.redir(PL_REDIR_SOCK0 + sock.num)
+    sys.buffalloc()
+
+    sock.protocol=PL_SOCK_PROTOCOL_TCP
+    sock.httpportlist="80"
+    sock.inconmode=PL_SOCK_INCONMODE_ANY_IP_ANY_PORT
+    
+	'ethernet dhcp
+	if stg_get("DH",0)="1" then
+		dhcp_start(PL_SOCK_INTERFACE_NET,"","")
+	else
+		sys.debugprint("go to http://" + net.ip + "/index.html in the browser to see the home page\r\n")
+	end if
+    '-----------------------------------------------------------------
+	beep.divider=BEEP_DIVIDER
+	beep.play(BEEP_SHORT,PL_BEEP_CANINT)
+end sub

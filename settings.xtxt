@@ -1,0 +1,26 @@
+>>DH	E	B	1	0	1	I	0	Ethernet DHCP
+>>IP	E	D	1	4	4	I	192.168.1.40	Ethernet IP
+>>GI	E	D	1	4	4	I	192.168.1.1	Ethernet Gateway IP
+>>NM	E	D	1	4	4	I	255.255.255.0	Ethernet Netmask
+>>APN	E	S	1	0	32	A	^	Wi-Fi SSID
+>>WD	E	B	1	0	1	I	0	Wi-Fi DHCP
+>>WI	E	D	1	4	4	I	192.168.1.41	Wi-Fi IP
+>>WG	E	D	1	4	4	I	192.168.1.1	Wi-Fi Gateway IP
+>>WN	E	D	1	4	4	I	255.255.255.0	Wi-Fi Netmask
+>>PMK	E	S	1	32	32	A	12345678901234567890123456789012	Pre-shared master key
+>>PWD	E	S	1	0	26	A	^	Wifi Password
+>>WE	E	B	1	0	1	A	0	Wifi Enabled
+>>SEC	E	B	1	0	4	A	0	Security Mode
+>>LT	E	W	1	1000	5000	A	1000
+>>LS	E	W	1	60	65535	A	60
+>>ST	E	W	1	0	3	A	0
+>>NT	E	W	1	1000	5000	A	1000
+>>NS	E	W	1	60	65535	A	60
+>>LX	E	W	1	1000	5000	A	1000
+>>NX	E	W	1	1000	5000	A	1000
+>>STG	E	S	1	0	128	A	^	dummy setting
+#define STG_DESCRIPTOR_FILE "settings.xtxt"
+#define STG_MAX_NUM_SETTINGS 21
+#define STG_RAM_ARRAY_SIZE 0
+#define STG_MAX_SETTING_NAME_LEN 3
+#define STG_MAX_SETTING_VALUE_LEN 128

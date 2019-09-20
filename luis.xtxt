@@ -1,0 +1,16 @@
+I=NET;D=Network;T=GROUP;
+I=DH;D=DHCP;T=INT;C=STATIC;O=0- Disabled/0/1- Enabled/1;F=R;xIndex=1;
+I=IP;D=IP-address;T=STRING;C=IPCTRL;S=DH==0?"e":"i";F=R*;xIndex=2;
+I=GI;D=Gateway IP;T=STRING;C=IPCTRL;xIndex=3;S=DH==0?"e":"i";
+I=NM;D=Subnet mask;T=STRING;C=IPCTRL;xIndex=4;S=DH==0?"e":"i";
+I=TM;D=Timing;T=GROUP;
+I=LT;D=Device Link Check Timeout;T=INT;C=EDIT;V=LT<1000||LT>5000?"Must be between 1000 and 5000":"";xIndex=6;
+I=LS;D=Device Link Check Sleep Time;T=INT;C=EDIT;V=LS<60||LS>65535?"Must be between 60 and 0xFFFF":"";xIndex=7;
+I=ST;D=Deivce Sensor Type;T=INT;C=STATIC;O=0- H1H6130/0/1- ADXL312/1/2- MCP9808/2/3- BH1721FVL/3/4- Flood/4;xIndex=8;
+I=NT;D=Normal Send Timeout;T=INT;C=EDIT;V=NT<1000||NT>5000?"Must be between 1000 and 5000":"";xIndex=9;
+I=NS;D=Normal Sleep Time;T=INT;C=EDIT;V=NS<60||NT>65535?"Must be between 60 and 0xFFFF":"";xIndex=10;
+I=LX;D=Link Check TX Timeout;T=INT;C=EDIT;V=LX<1000||LX>5000?"Must be between 1000 and 5000":"";xIndex=11;
+I=NX;D=Normal Radio TX Timeout;T=INT;C=EDIT;V=NX<1000||NX>5000?"Must be between 1000 and 5000":"";xIndex=12;
+I=RD;D=External sensors;T=GROUP;
+I=STG;T=STRING;D=Sensor 1;C=EDIT;xIndex=14;
+@@STG_RefPath=settings.xtxt

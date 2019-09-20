@@ -1,0 +1,64 @@
+'DEFINES-------------------------------------------------------------
+#define WLN_AVAILABLE 0
+#define DHCP_DEBUG_PRINT 1
+
+#define WLN_AVAILABLE 1
+#define WLN_WPA 1
+#define WLN_DEBUG_PRINT 1
+
+#if PLATFORM_ID=EM500 or PLATFORM_ID=EM500W or PLATFORM_ID=EM510W
+    #define WLN_RESET_MODE 1 'there will be no dedicated reset, and all other lines are fixed
+#elif PLATFORM_ID=EM1206 or PLATFORM_ID=EM1206W
+    #define WLN_CLK PL_IO_NUM_14
+    #define WLN_CS PL_IO_NUM_15
+    #define WLN_DI PL_IO_NUM_12
+    #define WLN_DO PL_IO_NUM_13
+    #define WLN_RST PL_IO_NUM_11
+#else
+    'EM1000, NB1010,...
+    #define WLN_CLK PL_IO_NUM_53
+    #define WLN_CS PL_IO_NUM_49
+    #define WLN_DI PL_IO_NUM_52
+    #define WLN_DO PL_IO_NUM_50
+    #define WLN_RST PL_IO_NUM_51
+#endif
+
+#define BEEP_DIVIDER 21600       
+
+#define LUIS_CONFIG_FILE "luis.xtxt"
+#define LUIS_DEBUG_PRINT 1
+
+
+const DEVICE_NET_IP = "192.168.1.101"
+const DEVICE_NET_MASK = "255.255.255.0"
+const DEVICE_NET_GATEWAY = "192.168.1.1"
+
+const LUIS_BT_DEVICE_NAME="MyBTDevice"
+const BUTTON_CONST_QUICK_INIT=5 'in 0.5 intervals -- how long you need to press button for quick init
+
+
+const BEEP_SHORT=					"BB"					'OK of some kind
+const BEEP_LONG=					"BBBBBB"				'ERROR of some kind
+
+const PAT_BOTH_OFF=					"-"						'starting setting initialization		
+const PAT_LONG_GREEN=				"GGGGGGGG-"				'settings initialized successfully
+const PAT_LONG_RED=					"RRRRRRRR-"				'settings failed to initialize
+
+
+'INCLUDES------------------------------------------------------------
+include "sock\trunk\sock.tbh"
+includepp "settings.xtxt"
+include "settings\trunk\settings.tbh"
+include "dhcp\trunk\dhcp.tbh"
+include "time\trunk\time.tbh"
+include "wln\trunk\wln.tbh"
+include "libraries\luis.tbh"
+includepp "luis.xtxt"
+
+
+'DECLARATIONS--------------------------------------------------------
+declare sub close_interface_sockets(interface as pl_sock_interfaces)
+declare function device_setting_init(init_mode as en_stg_init_modes) as ok_ng
+
+
+declare sub boot()
