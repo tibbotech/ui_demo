@@ -3,7 +3,7 @@
 dim cmd_str as string
 dim result as string
 dim x,y as byte
-dim http_cmd_str as string(LUIS_MAX_BT_CMD_LEN)
+dim http_cmd_str as string(STG_MAX_SETTING_VALUE_LEN)
 
 
 cmd_str=sock.httprqstring
@@ -11,7 +11,7 @@ if cmd_str<>"" then
 
 	x=instr(1,cmd_str,chr(LUIS_STX),1)
 	'this will prevent the string to overflow with garbage
-	if len(cmd_str)=LUIS_MAX_BT_CMD_LEN then
+	if len(cmd_str)=STG_MAX_SETTING_VALUE_LEN then
 		y=instr(1,cmd_str,chr(LUIS_CR),1)
 		if x=0 or y=0 then
 			cmd_str=""
@@ -49,13 +49,9 @@ else
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-	<link rel="stylesheet" href="app.css" />
     <title>Settings Configurator</title>
 </head>
 <body>
-		<div id="settings-container"></div>
-    <br/>
-    <script src="settings.js"></script>
     <script>
         var sdf = `
         <?
@@ -73,10 +69,9 @@ else
 
 		?>
         `;
-        var settings = new Settings(sdf, $('#settings-container'), CONNECTION_TYPE_HTTP);
-        settings.init();
-		settings.refreshSettings();
-    </script>
+	</script>
+	<div id="app"></div>
+    <script type="text/javascript" src="bundle.js"></script>
 </body>
 </html>
 

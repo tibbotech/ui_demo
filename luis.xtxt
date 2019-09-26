@@ -1,5 +1,5 @@
 I=NET;D=Network;T=GROUP;
-I=DH;D=DHCP;T=INT;C=STATIC;O=0- Disabled/0/1- Enabled/1;F=R;xIndex=1;
+I=DH;D=DHCP;T=INT;C=SWITCH;O=0- Disabled/0/1- Enabled/1;F=R;xIndex=1;
 I=IP;D=IP-address;T=STRING;C=IPCTRL;S=DH==0?"e":"i";F=R*;xIndex=2;
 I=GI;D=Gateway IP;T=STRING;C=IPCTRL;xIndex=3;S=DH==0?"e":"i";
 I=NM;D=Subnet mask;T=STRING;C=IPCTRL;xIndex=4;S=DH==0?"e":"i";

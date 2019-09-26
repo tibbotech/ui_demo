@@ -34,6 +34,7 @@ dim luis_html_placeholder_start as dword
 dim luis_html_placeholder_end as dword
 dim luis_html_read_pointer as dword
 dim luis_html_send_state as en_luis_html_send_states
+dim luis_chunk_size as dword
 
 '================================================================================
 function luis_start(byref bt_name as string) as en_luis_status_codes
@@ -48,27 +49,7 @@ function luis_start(byref bt_name as string) as en_luis_status_codes
 	#endif
 	
 	if wln.enabled = NO then
-		wln.csmap=LUIS_BT_CS
-		io.num=LUIS_BT_CS
-		io.enabled=YES
-		wln.dimap=LUIS_BT_DI
-		wln.domap=LUIS_BT_DO
-		io.num=LUIS_BT_DO
-		io.enabled=YES
-		wln.clkmap=LUIS_BT_CLK
-		io.num=LUIS_BT_CLK
-		io.enabled=YES
-		io.num=LUIS_BT_RST
-		io.enabled=YES
-		wln.disable
-		
-		io.num=LUIS_BT_RST
-		io.state=LOW
-		luis_delay_ms(1)
-		io.state=HIGH
-		
-		sys.buffalloc()
-		
+		wln_init()
 		wln.boot(0)
 	else
 		#if LUIS_DEBUG_PRINT
@@ -83,13 +64,17 @@ function luis_start(byref bt_name as string) as en_luis_status_codes
 		luis_init_flag=0
 		luis_start=EN_LUIS_BT_FAILURE
 	else
-		bt.name=bt_name
-		bt.emulation=PL_WLN_BT_EMULATION_MODE_MICROCHIP
-		bt.txbuffrq(LUIS_BT_TX_BUF_SIZE)
-		bt.rxbuffrq(LUIS_BT_RX_BUF_SIZE)
-		sys.buffalloc()
-		bt.enable()
+		if bt.enabled=NO then
+			bt.name=bt_name
+			bt.emulation=PL_WLN_BT_EMULATION_MODE_MICROCHIP
+			bt.txbuffrq(LUIS_BT_TX_BUF_SIZE)
+			bt.rxbuffrq(LUIS_BT_RX_BUF_SIZE)
+			sys.buffalloc()
+			bt.enable()
+		end if
 	end if
+	
+	luis_chunk_size=bt.txfree
 	
 	romfile.open(LUIS_HTML_FILE)
 	if romfile.pointer32<>1 then
@@ -157,7 +142,7 @@ sub luis_on_bt_data_sent()
 	end if
 
 
-	dim chunk_size as dword = 255
+	dim chunk_size as dword = luis_chunk_size
 	
 	if len(luis_current_send_chunk)<>0 and bt.txfree-bt.newtxlen >=len(luis_current_send_chunk) then
 		bt.setdata(luis_current_send_chunk)
@@ -175,7 +160,7 @@ sub luis_on_bt_data_sent()
 	case EN_LUIS_HTML_SEND_PART1:
 		romfile.open(LUIS_HTML_FILE)
 		romfile.pointer32=luis_html_read_pointer
-		if luis_html_read_pointer + chunk_size > luis_html_placeholder_start then
+		if luis_html_read_pointer+chunk_size > luis_html_placeholder_start then
 			chunk_size = luis_html_placeholder_start - luis_html_read_pointer
 			luis_html_send_state=EN_LUIS_HTML_SEND_CONFIG
 		end if
@@ -207,7 +192,7 @@ end sub
 
 function luis_proc_cmd(byref cmd_str as string) as string
 	luis_proc_cmd=""
-	dim reply_str as string(LUIS_MAX_BT_RPL_LEN)
+	dim reply_str as string(STG_MAX_SETTING_VALUE_LEN)
 	dim x as byte
 	dim setting_name as string(STG_MAX_SETTING_NAME_LEN)
 	dim explicit_index as no_yes
@@ -280,8 +265,6 @@ function luis_proc_cmd(byref cmd_str as string) as string
 
 	case "E": 'reboot -------------------------------------------
 		wln.disable()
-		io.num=LUIS_BT_RST
-		io.state=LOW
 		sys.reboot()
 	
 	case else
@@ -320,7 +303,7 @@ end function
 function luis_on_bt_data_arrival() as en_luis_status_codes
 	dim x,y as byte
 	dim reply as string
-	dim bt_cmd_str as string(LUIS_MAX_BT_CMD_LEN)
+	dim bt_cmd_str as string(STG_MAX_SETTING_VALUE_LEN)
 	luis_on_bt_data_arrival=EN_LUIS_STATUS_OK
 	
 	if luis_init_flag<>LUIS_INIT_SIGNATURE then
@@ -332,7 +315,7 @@ function luis_on_bt_data_arrival() as en_luis_status_codes
 	
 	x=instr(1,bt_cmd_str,chr(LUIS_STX),1)
 	'this will prevent the string to overflow with garbage
-	if len(bt_cmd_str)=LUIS_MAX_BT_CMD_LEN then
+	if len(bt_cmd_str)=STG_MAX_SETTING_VALUE_LEN then
 		y=instr(1,bt_cmd_str,chr(LUIS_CR),1)
 		if x=0 or y=0 then
 			bt_cmd_str=""
